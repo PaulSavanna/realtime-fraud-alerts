@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fraud Alerts</title>
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <h1>Fraud Alerts Dashboard</h1>
+    <p>Статус: <span id="status">polling...</span></p>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="transactions"></tbody>
+    </table>
+
+    <script>
+        async function fetchTransactions() {
+            const res = await fetch('/transactions');
+            const data = await res.json();
+            const tbody = document.getElementById('transactions');
+            tbody.innerHTML = '';
+            data.transactions.reverse().forEach(tx => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${tx.id}</td>
+                    <td>${tx.user_id}</td>
+                    <td>$${tx.amount}</td>
+                    <td>${new Date(tx.timestamp * 1000).toLocaleTimeString()}</td>
+                    <td>${tx.status}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        setInterval(fetchTransactions, 2000);
+        fetchTransactions();
+    </script>
+</body>
+</html>
