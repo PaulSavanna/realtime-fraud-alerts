@@ -11,7 +11,7 @@
 </head>
 <body>
     <h1>Fraud Alerts Dashboard</h1>
-    <p>Статус: <span id="status">polling...</span></p>
+    <p>Статус: <span id="status">connecting...</span></p>
     <table>
         <thead>
             <tr>
@@ -26,12 +26,24 @@
     </table>
 
     <script>
-        async function fetchTransactions() {
-            const res = await fetch('/transactions');
-            const data = await res.json();
+        const ws = new WebSocket(`ws://${location.host}/ws`);
+        const transactions = [];
+        const statusEl = document.getElementById('status');
+
+        ws.onopen = () => { statusEl.textContent = 'connected'; };
+        ws.onclose = () => { statusEl.textContent = 'disconnected'; };
+
+        ws.onmessage = (event) => {
+            const tx = JSON.parse(event.data);
+            transactions.unshift(tx);
+            if (transactions.length > 50) transactions.pop();
+            renderTable();
+        };
+
+        function renderTable() {
             const tbody = document.getElementById('transactions');
             tbody.innerHTML = '';
-            data.transactions.reverse().forEach(tx => {
+            transactions.forEach(tx => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${tx.id}</td>
@@ -43,9 +55,6 @@
                 tbody.appendChild(row);
             });
         }
-
-        setInterval(fetchTransactions, 2000);
-        fetchTransactions();
     </script>
 </body>
 </html>
