@@ -1,14 +1,15 @@
+import asyncio
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-from backend.generator import transactions, start_generator
+from backend.generator import transactions, generate_and_broadcast
 from backend.ws import manager
 
 app = FastAPI()
 
 @app.on_event("startup")
 def startup():
-    start_generator()
+    asyncio.create_task(generate_and_broadcast())
 
 @app.get("/transactions")
 def get_transactions():
