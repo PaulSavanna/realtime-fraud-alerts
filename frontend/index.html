@@ -26,19 +26,34 @@
     </table>
 
     <script>
-        const ws = new WebSocket(`ws://${location.host}/ws`);
+        let ws;
+        let reconnectAttempts = 0;
         const transactions = [];
-        const statusEl = document.getElementById('status');
 
-        ws.onopen = () => { statusEl.textContent = 'connected'; };
-        ws.onclose = () => { statusEl.textContent = 'disconnected'; };
+        function connect() {
+            ws = new WebSocket(`ws://${location.host}/ws`);
 
-        ws.onmessage = (event) => {
-            const tx = JSON.parse(event.data);
-            transactions.unshift(tx);
-            if (transactions.length > 50) transactions.pop();
-            renderTable();
-        };
+            ws.onopen = () => {
+                document.getElementById('status').textContent = 'connected';
+                document.getElementById('status').style.color = 'green';
+                reconnectAttempts = 0;
+            };
+
+            ws.onclose = () => {
+                document.getElementById('status').textContent = 'reconnecting...';
+                document.getElementById('status').style.color = 'orange';
+                const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+                reconnectAttempts++;
+                setTimeout(connect, delay);
+            };
+
+            ws.onmessage = (event) => {
+                const tx = JSON.parse(event.data);
+                transactions.unshift(tx);
+                if (transactions.length > 50) transactions.pop();
+                renderTable();
+            };
+        }
 
         function renderTable() {
             const tbody = document.getElementById('transactions');
@@ -55,6 +70,8 @@
                 tbody.appendChild(row);
             });
         }
+
+        connect();
     </script>
 </body>
 </html>
