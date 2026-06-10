@@ -2,6 +2,8 @@ import random
 import time
 import asyncio
 
+from .rules import check_amount
+
 transactions = []
 
 async def generate_and_broadcast():
@@ -17,6 +19,8 @@ async def generate_and_broadcast():
                 "timestamp": time.time(),
                 "status": "normal"
             }
+            if check_amount(tx):
+                tx["status"] = "suspicious"
             transactions.append(tx)
             await manager.broadcast(tx)
         await asyncio.sleep(random.uniform(1, 5))
