@@ -21,3 +21,8 @@ def check_frequency(tx: dict) -> bool:
         if now - t < FREQUENCY_WINDOW
     ]
     return len(user_transactions[user_id]) > FREQUENCY_THRESHOLD
+
+
+def check_suspicious(tx: dict) -> bool:
+    """Комбинированная проверка"""
+    return check_amount(tx) or check_frequency(tx)
