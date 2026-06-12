@@ -12,6 +12,10 @@
 <body>
     <h1>Fraud Alerts Dashboard</h1>
     <p>Статус: <span id="status">connecting...</span></p>
+    <div id="stats">
+        <p>За последний час: <span id="hourly-count">0</span> транзакций</p>
+        <p>Подозрительных: <span id="suspicious-count">0</span></p>
+    </div>
     <table>
         <thead>
             <tr>
@@ -52,7 +56,16 @@
                 transactions.unshift(tx);
                 if (transactions.length > 50) transactions.pop();
                 renderTable();
+                updateStats();
             };
+        }
+
+        function updateStats() {
+            const oneHourAgo = Date.now() / 1000 - 3600;
+            const recent = transactions.filter(t => t.timestamp > oneHourAgo);
+            document.getElementById('hourly-count').textContent = recent.length;
+            document.getElementById('suspicious-count').textContent =
+                recent.filter(t => t.status === 'suspicious').length;
         }
 
         function renderTable() {
