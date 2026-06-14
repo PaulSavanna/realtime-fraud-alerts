@@ -51,12 +51,24 @@
                 setTimeout(connect, delay);
             };
 
+            let pendingTx = [];
+            let renderTimeout = null;
+
             ws.onmessage = (event) => {
                 const tx = JSON.parse(event.data);
-                transactions.unshift(tx);
-                if (transactions.length > 50) transactions.pop();
-                renderTable();
-                updateStats();
+                pendingTx.push(tx);
+                if (!renderTimeout) {
+                    renderTimeout = setTimeout(() => {
+                        pendingTx.forEach(t => {
+                            transactions.unshift(t);
+                            if (transactions.length > 50) transactions.pop();
+                        });
+                        pendingTx = [];
+                        renderTable();
+                        updateStats();
+                        renderTimeout = null;
+                    }, 300);
+                }
             };
         }
 
