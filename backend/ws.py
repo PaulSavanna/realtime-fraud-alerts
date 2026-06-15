@@ -9,6 +9,9 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
+        from .generator import transactions
+        for tx in transactions[-50:]:
+            await websocket.send_json(tx)
         print(f"Client connected. Total: {len(self.active_connections)}")
 
     def disconnect(self, websocket: WebSocket):
