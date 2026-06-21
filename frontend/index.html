@@ -60,6 +60,9 @@
             tbody.innerHTML = '';
             transactions.forEach(tx => {
                 const row = document.createElement('tr');
+                if (tx.status === 'suspicious') {
+                    row.style.backgroundColor = '#ffe0e0';
+                }
                 row.innerHTML = `
                     <td>${tx.id}</td>
                     <td>${tx.user_id}</td>
