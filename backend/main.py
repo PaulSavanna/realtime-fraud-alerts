@@ -1,15 +1,24 @@
 import asyncio
+import os
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from backend.generator import transactions, generate_and_broadcast
 from backend.ws import manager
 
-app = FastAPI()
 
-@app.on_event("startup")
-def startup():
-    asyncio.create_task(generate_and_broadcast())
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    task = None
+    if not os.environ.get("TESTING"):
+        task = asyncio.create_task(generate_and_broadcast())
+    yield
+    if task:
+        task.cancel()
+
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/transactions")
 def get_transactions():
