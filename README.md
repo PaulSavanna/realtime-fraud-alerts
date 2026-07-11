@@ -1,5 +1,12 @@
 # Realtime Fraud Alerts
 
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.x-009688?logo=fastapi&logoColor=white)
+![WebSocket](https://img.shields.io/badge/WebSocket-real--time-blue)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![CI](https://github.com/PaulSavanna/realtime-fraud-alerts/actions/workflows/ci.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 Real-time dashboard for monitoring suspicious transactions using WebSocket push-based architecture.
 
 ## Problem
